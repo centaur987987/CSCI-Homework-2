@@ -2,7 +2,6 @@
 # import libraries
 import numpy as np
 
-
 class Kmeans:
     def __init__(self,k=8): 
         self.num_cluster = k  # Placeholders for the number of clusters
@@ -108,7 +107,7 @@ class Kmeans:
 #   centers: (k, d)
 def initCenters(X, dataIndex):
     # assign the position of specified points as the centers
-    centers = X[dataIndex]   
+    centers = X[dataIndex] # given the initial centers in data index, capture those rows of data as the centers
     return centers
 
 
@@ -118,10 +117,10 @@ def initCenters(X, dataIndex):
 #   centers:   k center position, (k, d)
 # Output:
 #   dis: k distances, k
-def computeDis(x, centers):
-    
+def computeDis(x, centers):    
     # compute distance
-    dis = np.linalg.norm(centers - x, axis = 1)
+    diff = centers - x
+    dis = np.linalg.norm(diff, axis = 1) # find the distance between the data at each center and the data at each non center interated over all rows
     return dis
 
 
@@ -131,7 +130,7 @@ def computeDis(x, centers):
 # Output
 #   centers:   k center position, (k, d)
 def assignCen(distances):
-    assignment = np.argmin(distances)  
+    assignment = np.argmin(distances)  # Find the smallest distance in each row so that the nearest center for that row can be captured
     return assignment
 
 
@@ -141,12 +140,14 @@ def assignCen(distances):
 # Output
 #   centers:   k center position, (k, d)
 def updateCen(new_center):
-    centers = np.zeros_like(new_center['center'])  # placeholders of centers, can be ignored or removed
-
-    # --------------- fill your code ---------------------
+    centers = np.zeros_like(new_center['center'])
     # get the postion of each center by dividsion between the 
     # sum of points at one center and their corresponding count
-
+    # new_center captures K new center rows and their data in 'center' and the amount of times they are the lowest in 'num_sample' 
+    new_center_sum = new_center['center'] # sum of all data that has the minimum distance to its correlated center
+    new_center_count = new_center['num_sample'] # number of data points that were closest to a given center
+    for i in range(len(new_center_sum)): # index through K centers
+        centers[i] = new_center_sum[i] / new_center_count[i] # divide the count 
     return centers
 
 
