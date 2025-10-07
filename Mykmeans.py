@@ -1,6 +1,7 @@
 # Implementation of KMEANS
 # import libraries
 import numpy as np
+import sys
 
 class Kmeans:
     def __init__(self,k=8): 
@@ -87,7 +88,7 @@ class Kmeans:
             # (2) get the label of the cluster as predicted label for that data
             x=i
 
-
+        print(prediction.shape)
         return prediction
 
     def params(self):
@@ -156,6 +157,7 @@ def updateCen(new_center):
 def computeError(X, assign, centers):
     error = 0   # placeholders of errors, can be ignored or removed
 
-    # --------------- fill your code ---------------------
-
+    for i in range(len(assign)): # Loop through all rows of data
+        error += sum((X[i] - centers[assign[i]]) ** 2) # complete the J equation, but add all data error together into one value
+  
     return error
