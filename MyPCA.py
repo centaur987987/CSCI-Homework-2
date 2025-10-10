@@ -54,10 +54,9 @@ class PCA():
 # Output:
 #   centered_X: (n,d)
 def centerData(X, mean):
+   
     centered_X = np.zeros_like(X)  # placeholder, can be ignored
-
-    # --------------- fill your code ---------------------
-
+    centered_X = X - mean # subtract the mean vector from the data matrix
     return centered_X
 
 
@@ -68,17 +67,16 @@ def centerData(X, mean):
 #   eig_val: eigenvectors, (d,p)
 #   eig_vec: eigenvalues, (p,) p is the number of eigenvectors
 def computeE(centered_X):
-    # placeholders, can be ignored 
-    eig_val = 0
-    eig_vec = np.zeros([centered_X.shape[1]])
-
-    # --------------- fill your code ---------------------
+   
     # (1) get the covariance matrix
     # (2) eigendecomposation of cov, can use np.linalg.eigh(), 
     # plase note the output vals and corresponding vectors are in ascending order, and the shape of vectors are (d, p)
     # (3) reverse the order of eig_val and eig_vec to make it in descending order
 
-
+    Cov_Data = np.cov(centered_X.T) # find covariance matrix of data
+    [eig_val_rev, eig_vec_rev] = np.linalg.eigh(Cov_Data) # find eigenvalues and eigenvectors
+    eig_val = np.flip(eig_val_rev, axis = None) # reverse eigenvalue order to match code format
+    eig_vec = np.flip(eig_vec_rev, axis = 1) # reverse eigenvector order to match code format
     return eig_val, eig_vec
 
 
@@ -89,13 +87,22 @@ def computeE(centered_X):
 # Output:
 #   num_dim: number of dimensions to keep, scaler
 def computeDim(eig_val, percent):
-    num_dim = 0     # placehodlers
-
-    # --------------- fill your code ---------------------
+   
     # iterate to add eigen values, until reach the percentage to keep
     # e.g. if eig_val = [0.1, 0.1, 0.3, 0.1, 0.1, 0.3], to keep percent>0.5, num_dim = 4, 
     # beause (0.1+0.1+0.3)/sum(eig_val) = 0.5 is no bigger than 0.5, while (0.1+0.1+0.3+0.1)/sum(eig_val)>0.5
 
+    eig_val_keep = np.array([]) # initialize a new array of eigenvalues to keep
+
+    # iterate through each eigenvalue in the eigenvalue list
+    for i in range(len(eig_val)): 
+        eig_val_keep = np.append(eig_val_keep, eig_val[i]) # append the newly made array of eigenvalues to keep
+        judge = sum(eig_val_keep) / sum(eig_val) # determine the current percentage of eigenvalues
+        # judge if they new percentage is greater than the chosen percentage
+        if judge > percent:
+            num_dim = len(eig_val_keep) # the number dimension = the amount of eigenvalues in the new eigenvalue array
+            break
+    
     return num_dim
 
 
@@ -106,8 +113,5 @@ def computeDim(eig_val, percent):
 # Output:
 #   X_pca: projected data (n, p)
 def project(X, w):
-    X_pca = np.zeros([X.shape[0], w.shape[1]])  # placeholders 
-
-    # --------------- fill your code ---------------------
-
+    X_pca = X @ w # multiply data by the projection matrix to lower the dimension of the data
     return X_pca

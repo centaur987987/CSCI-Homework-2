@@ -83,12 +83,12 @@ class Kmeans:
 
         # iterate through the test samples
         for i in range(len(X)):
-            # --------------------------- fill in code -----------------------------
             # (1) find the cluster of each sample
             # (2) get the label of the cluster as predicted label for that data
-            x=i
-
-        print(prediction.shape)
+            
+            Distance = computeDis(X[i], self.center) # Find the distance of a test sample to the decided centers
+            assignment = assignCen(Distance) # determine which distance is the smallest and therefore which center the test sample should be categorized to
+            prediction[i] = self.cluster_label[assignment] # set i of prediction to be the truth label value of the assignment index
         return prediction
 
     def params(self):
@@ -120,8 +120,11 @@ def initCenters(X, dataIndex):
 #   dis: k distances, k
 def computeDis(x, centers):    
     # compute distance
-    diff = centers - x
-    dis = np.linalg.norm(diff, axis = 1) # find the distance between the data at each center and the data at each non center interated over all rows
+    diff = centers - x # create a matrix of the difference between the centers matrix and a single row of x for every iteration of computeDis()
+    dis = np.zeros_like(centers[:, 0]) # create an empty dis of length k
+    for i in range(len(dis)): # loop for the length of k
+        normal = np.linalg.norm(diff[i, :]) # normalize the full row of distances between center feature values and x feature values
+        dis[i] = normal
     return dis
 
 
@@ -131,13 +134,19 @@ def computeDis(x, centers):
 # Output
 #   centers:   k center position, (k, d)
 def assignCen(distances):
-    assignment = np.argmin(distances)  # Find the smallest distance in each row so that the nearest center for that row can be captured
+    assignment = np.argmin(distances)  # Find the index of the smallest distance in each distance array. This assigns each row of data to a center.
     return assignment
 
 
 # compute center by dividing the sum of points with the corresponding count
 # input:
 #   new_center:  dict, structre specified in previous commonts line 38-41
+
+## LINES #38-41
+# using additional space to reduce time complexity
+            # For instance, assuming you have X = [1,2,3,4,5,5,5,7,8], and expect to have 2 centers, new_center['center'] = [[0], [0]] at first
+            # during iteration, for each data assessed, you can add the point postion to corresponding center, if you assign x[0],x[1] to cluster 0, new_center['center'] = [[1+2], [0]]
+            # and new_center['num_sample'] = [2, 0]. Until finished, you can directly compute the updated center by dividing new_center['center'] with its corresponding count new_center['num_sample']
 # Output
 #   centers:   k center position, (k, d)
 def updateCen(new_center):
@@ -145,10 +154,12 @@ def updateCen(new_center):
     # get the postion of each center by dividsion between the 
     # sum of points at one center and their corresponding count
     # new_center captures K new center rows and their data in 'center' and the amount of times they are the lowest in 'num_sample' 
-    new_center_sum = new_center['center'] # sum of all data that has the minimum distance to its correlated center
-    new_center_count = new_center['num_sample'] # number of data points that were closest to a given center
-    for i in range(len(new_center_sum)): # index through K centers
-        centers[i] = new_center_sum[i] / new_center_count[i] # divide the count 
+    
+    center = new_center['center'] # sum of all data that has the minimum distance to its correlated center
+    num_sample = new_center['num_sample'] # number of data points that were closest to a given center
+
+    for i in range(len(center)): # index through K centers
+        centers[i] = center[i] / num_sample[i] # divide each feature value sum by the number of times that collective data row was closest to center number i
     return centers
 
 

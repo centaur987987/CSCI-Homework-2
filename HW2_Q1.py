@@ -1,7 +1,7 @@
 import numpy as np
 
 
-## PART A
+'''## PART A
 N = 4
 HW = [[-1, 0, 0, 1] , [0, -1, 0, 1]]
 X = np.array(HW) # build array from mean subtracted from points
@@ -30,4 +30,16 @@ print(var)
 matrix = np.array([[1, 2, 3, 4], [-1, 1, 4, 4]])
 row_norms = np.linalg.norm(matrix, axis=1)
 print(f"Matrix:\n{matrix}")
-print(f"L2 Norm of each row: {row_norms}")
+print(f"L2 Norm of each row: {row_norms}")'''
+
+#quiz
+X = np.array([[0, 4, -1], [0, 0, 0]])
+print(X)
+
+m = np.mean(X, axis = 1)
+print(m)
+
+S = np.cov(X)
+print(S)
+
+print(X @ X.T)
